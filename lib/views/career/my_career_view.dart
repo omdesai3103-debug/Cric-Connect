@@ -10,6 +10,56 @@ import '../tournaments/tournament_detail_view.dart';
 class MyCareerView extends StatelessWidget {
   const MyCareerView({super.key});
 
+  Future<void> _editName(BuildContext context) async {
+    final auth = context.read<AuthViewModel>();
+    final controller =
+        TextEditingController(text: auth.hasName ? auth.displayName : '');
+    final formKey = GlobalKey<FormState>();
+
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Edit name'),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller,
+            autofocus: true,
+            maxLength: 30,
+            textCapitalization: TextCapitalization.words,
+            decoration: const InputDecoration(
+              labelText: 'Display name',
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) => (value == null || value.trim().isEmpty)
+                ? 'Enter a name'
+                : null,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(dialogContext, controller.text.trim());
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (newName == null || !context.mounted) return;
+    auth.updateName(newName);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Name updated')),
+    );
+  }
+
   Widget _sectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 24, 4, 8),
@@ -43,7 +93,8 @@ class MyCareerView extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           _HeaderCard(
-            name: auth.isLoggedIn ? auth.userName! : 'Guest Player',
+            name: auth.displayName,
+            onEditName: () => _editName(context),
             matches: matches.length,
             tournaments: tournaments.length,
             completed: completed,
@@ -89,12 +140,14 @@ class MyCareerView extends StatelessWidget {
 
 class _HeaderCard extends StatelessWidget {
   final String name;
+  final VoidCallback onEditName;
   final int matches;
   final int tournaments;
   final int completed;
 
   const _HeaderCard({
     required this.name,
+    required this.onEditName,
     required this.matches,
     required this.tournaments,
     required this.completed,
@@ -116,6 +169,7 @@ class _HeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final base = TextStyle(color: colors.onPrimary);
+    final initial = name.isEmpty ? '?' : name[0].toUpperCase();
 
     return Card(
       color: colors.primary,
@@ -126,14 +180,36 @@ class _HeaderCard extends StatelessWidget {
             CircleAvatar(
               radius: 32,
               backgroundColor: colors.onPrimary,
-              child: Icon(Icons.person, size: 36, color: colors.primary),
+              child: Text(
+                initial,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: colors.primary,
+                ),
+              ),
             ),
             const SizedBox(height: 8),
-            Text(
-              name,
-              style: base.copyWith(fontSize: 22, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(width: 40), // balances the edit button
+                Flexible(
+                  child: Text(
+                    name,
+                    overflow: TextOverflow.ellipsis,
+                    style: base.copyWith(
+                        fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Edit name',
+                  onPressed: onEditName,
+                  icon: Icon(Icons.edit, size: 20, color: colors.onPrimary),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Row(
               children: [
                 _stat('$matches', 'Matches', base),

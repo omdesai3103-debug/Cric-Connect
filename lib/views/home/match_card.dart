@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/cricket_match.dart';
+import 'match_detail_view.dart';
 
 class MatchCard extends StatelessWidget {
   final CricketMatch match;
@@ -13,42 +14,50 @@ class MatchCard extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                _StatusBadge(status: match.status),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    match.venue,
-                    style: text.bodySmall,
-                    overflow: TextOverflow.ellipsis,
+      clipBehavior: Clip.antiAlias, // keeps the tap ripple inside the card
+      child: InkWell(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => MatchDetailView(match: match)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _StatusBadge(status: match.status),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      match.venue,
+                      style: text.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _TeamRow(name: match.teamA, score: match.scoreA ?? ''),
-            const SizedBox(height: 6),
-            _TeamRow(
-              name: match.teamB,
-              score: match.scoreB ?? (isLive ? 'Yet to bat' : ''),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              match.status == MatchStatus.upcoming
-                  ? _formatStart(match.startTime)
-                  : (match.summary ?? ''),
-              style: text.bodyMedium?.copyWith(
-                color: colors.primary,
-                fontWeight: FontWeight.w600,
+                  const Icon(Icons.chevron_right, size: 20),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              _TeamRow(name: match.teamA, score: match.scoreA ?? ''),
+              const SizedBox(height: 6),
+              _TeamRow(
+                name: match.teamB,
+                score: match.scoreB ?? (isLive ? 'Yet to bat' : ''),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                match.status == MatchStatus.upcoming
+                    ? _formatStart(match.startTime)
+                    : (match.summary ?? ''),
+                style: text.bodyMedium?.copyWith(
+                  color: colors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

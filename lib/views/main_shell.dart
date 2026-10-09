@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodels/tab_navigation.dart';
 import 'career/my_career_view.dart';
 import 'home/home_view.dart';
 import 'scoring/scoring_view.dart';
 import 'tournaments/tournaments_view.dart';
 
-class MainShell extends StatefulWidget {
+class MainShell extends StatelessWidget {
   const MainShell({super.key});
 
-  @override
-  State<MainShell> createState() => _MainShellState();
-}
-
-class _MainShellState extends State<MainShell> {
-  int _currentIndex = 0;
-
-  final List<Widget> _pages = const [
+  static const List<Widget> _pages = [
     HomeView(),
     ScoringView(),
     TournamentsView(),
@@ -23,13 +18,13 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final tabs = context.watch<TabNavigation>();
+
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: _pages[tabs.index],
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() => _currentIndex = index);
-        },
+        selectedIndex: tabs.index,
+        onDestinationSelected: tabs.go,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
