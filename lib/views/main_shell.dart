@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'career/my_career_view.dart';
 import 'home/home_view.dart';
 import 'scoring/scoring_view.dart';
 import 'tournaments/tournaments_view.dart';
-import 'profile/profile_view.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -18,7 +18,7 @@ class _MainShellState extends State<MainShell> {
     HomeView(),
     ScoringView(),
     TournamentsView(),
-    ProfileView(),
+    MyCareerView(),
   ];
 
   @override
@@ -47,9 +47,9 @@ class _MainShellState extends State<MainShell> {
             label: 'Tournaments',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+            icon: Icon(Icons.insights_outlined),
+            selectedIcon: Icon(Icons.insights),
+            label: 'My Career',
           ),
         ],
       ),

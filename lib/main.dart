@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme/app_theme.dart';
 import 'viewmodels/auth_view_model.dart';
+import 'viewmodels/match_history_view_model.dart';
+import 'viewmodels/tournament_view_model.dart';
 import 'views/main_shell.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthViewModel(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(create: (_) => TournamentViewModel()),
+        ChangeNotifierProvider(create: (_) => MatchHistoryViewModel()),
+      ],
       child: const CricConnectApp(),
     ),
   );
